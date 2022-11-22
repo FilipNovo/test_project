@@ -1,0 +1,6 @@
+2022-02-10 14-45-49:  Application started
+2022-02-10 14-45-58:  Test Application started
+2022-02-10 14-45-58:  Test application will start
+2022-02-10 14-45-58:  Closing all opened excel files to prevent excel errors
+2022-02-10 14-45-58:  Done closing all opened excel files
+2022-02-10 14-45-58:  Test application started

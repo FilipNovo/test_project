@@ -1,0 +1,18 @@
+2022-02-10 14-34-50:  Application started
+2022-02-10 14-34-58:  Test Application started
+2022-02-10 14-34-58:  Test application will start
+2022-02-10 14-34-58:  Closing all opened excel files to prevent excel errors
+2022-02-10 14-34-58:  Done closing all opened excel files
+2022-02-10 14-34-58:  Test application started
+2022-02-10 14-35-00:  Starting to run main application for testing
+2022-02-10 14-35-08:  Main application script started
+2022-02-10 14-35-08:  Creating object from Test cases file to use and copy of it to write the result of running excel file
+2022-02-10 14-35-11:  Done Creating object from Test cases file to use and copy of it to write the result of running excel file
+2022-02-10 14-35-11:  Creating object from elements Lookup excel table
+2022-02-10 14-35-12:  Done Creating object from elements Lookup table
+2022-02-10 14-35-15:  Elements checking gui is open
+2022-02-10 14-35-20:  Application_Text position needs to be re-set
+2022-02-10 14-35-23:  Application_Text position is right
+2022-02-10 14-35-23:  Wait saving Application_Text  new position
+2022-02-10 14-35-34:  Done saving Application_Text  new position
+2022-02-10 14-35-53:  Element postion gui is closed

@@ -1,0 +1,9 @@
+EEGer
+no logs
+
+sign files
+
+just locked to SM80 mode
+
+Startup modes in BeeLab:
+	do not ignore disable input check

@@ -1,0 +1,15 @@
+2022-02-10 14-47-16:  Application started
+2022-02-10 14-47-24:  Test Application started
+2022-02-10 14-47-24:  Test application will start
+2022-02-10 14-47-24:  Closing all opened excel files to prevent excel errors
+2022-02-10 14-47-24:  Done closing all opened excel files
+2022-02-10 14-47-24:  Test application started
+2022-02-10 14-47-31:  Starting to run main application for testing
+2022-02-10 14-47-38:  Main application script started
+2022-02-10 14-47-38:  Creating object from Test cases file to use and copy of it to write the result of running excel file
+2022-02-10 14-47-41:  Done Creating object from Test cases file to use and copy of it to write the result of running excel file
+2022-02-10 14-47-41:  Creating object from elements Lookup excel table
+2022-02-10 14-47-43:  Done Creating object from elements Lookup table
+2022-02-10 14-48-00:  SignatureValidation Started
+2022-02-10 14-48-14:  SignatureValidation Passed
+2022-02-10 14-48-18:  SignatureValidation Ended

@@ -1,0 +1,49 @@
+2022-03-08 10-27-47:  Application started
+2022-03-08 10-28-14:  Test Application started
+2022-03-08 10-28-14:  Closing all opened excel files to prevent excel errors
+2022-03-08 10-28-14:  Done closing all opened excel files
+2022-03-08 10-28-14:  Test application started
+2022-03-08 10-29-18:  Starting to run main application for testing
+2022-03-08 10-29-45:  Main application script started
+2022-03-08 10-29-45:  Creating object from Test cases file to use and copy of it to write the result of running excel file
+2022-03-08 10-29-46:  Done Creating object from Test cases file to use and copy of it to write the result of running excel file
+2022-03-08 10-29-46:  Creating object from elements Lookup excel table
+2022-03-08 10-29-47:  Done Creating object from elements Lookup table
+2022-03-08 10-43-38:  Elements checking gui is open
+2022-03-08 10-50-43:  Elements checking gui is open
+2022-03-08 10-54-58:  Application_Text position needs to be re-set
+2022-03-08 10-57-43:  Application_Text position needs to be re-set
+2022-03-08 10-58-06:  Application_Text position needs to be re-set
+2022-03-08 10-58-57:  Application_Text position needs to be re-set
+2022-03-08 10-59-39:  Application_Text position needs to be re-set
+2022-03-08 10-59-49:  Application_Text position needs to be re-set
+2022-03-08 11-00-48:  Application_Text position needs to be re-set
+2022-03-08 11-01-17:  Application_Text position is right
+2022-03-08 11-01-18:  Wait saving Application_Text  new position
+2022-03-08 11-01-22:  Done saving Application_Text  new position
+2022-03-08 11-12-23:  Feedback_Tab position needs to be re-set
+2022-03-08 11-12-35:  Feedback_Tab position needs to be re-set
+2022-03-08 11-12-47:  Feedback_Tab position needs to be re-set
+2022-03-08 11-12-53:  Feedback_Tab position needs to be re-set
+2022-03-08 11-13-01:  Feedback_Tab position needs to be re-set
+2022-03-08 11-13-17:  Feedback_Tab position needs to be re-set
+2022-03-08 11-13-34:  Feedback_Tab position needs to be re-set
+2022-03-08 11-14-27:  Feedback_Tab position is right
+2022-03-08 11-14-28:  Wait saving Feedback_Tab  new position
+2022-03-08 11-14-33:  Done saving Feedback_Tab  new position
+2022-03-08 11-15-53:  Graph_Tab position needs to be re-set
+2022-03-08 11-16-06:  Graph_Tab position needs to be re-set
+2022-03-08 11-16-16:  Graph_Tab position needs to be re-set
+2022-03-08 11-16-24:  Graph_Tab position is right
+2022-03-08 11-16-25:  Wait saving Graph_Tab  new position
+2022-03-08 11-16-30:  Done saving Graph_Tab  new position
+2022-03-08 11-17-39:  Report_Tab position needs to be re-set
+2022-03-08 11-17-50:  Report_Tab position needs to be re-set
+2022-03-08 11-17-55:  Report_Tab position needs to be re-set
+2022-03-08 11-18-39:  Report_Tab position needs to be re-set
+2022-03-08 11-18-48:  Report_Tab position needs to be re-set
+2022-03-08 11-18-54:  Report_Tab position needs to be re-set
+2022-03-08 11-18-59:  Report_Tab position is right
+2022-03-08 11-19-00:  Wait saving Report_Tab  new position
+2022-03-08 11-19-06:  Done saving Report_Tab  new position
+2022-03-08 11-19-28:  Element postion gui is closed

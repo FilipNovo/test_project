@@ -1,0 +1,1094 @@
+;Task 8 check Mute Functionality
+#SingleInstance, force
+#WinActivateForce
+#Include %A_ScriptDir%\IncludesFiles.ahk
+
+;#Include IncludesFiles.ahk
+objShell := ComObjCreate("WScript.Shell")
+objEnv := objShell.Environment("Volatile")
+hdWindowName := objEnv.Item("CYGNETHD_WINDOW_NAME")
+programName := objEnv.Item("PROGRAM_NAME")
+programLocation := objEnv.Item("PROGRAM_LOCATION")
+feedbackWindowName := objEnv.Item("FEEDBACK_WINDOW_NAME")
+executionFile := objEnv.Item("EXECTUION_FILE")
+windowClass := objEnv.Item("CYGNET_CLASS_NAME")
+console := objEnv.Item("consoleFile")
+result := ""
+testResult := objEnv.Item("testResult")
+cygnetElementsLookupTable := new CygnetElementsLookupTable(objEnv.Item("CygnetElementsLookupTableDefaultFile"))
+
+checkCertficate(programLocation){
+   global console
+   global objEnv
+   global executionFile
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      command = "Get-AuthenticodeSignature -FilePath  '%executionFile%'| Format-List | Out-File -FilePath .\Validation.txt"
+      RunPowershellCommand(command)
+      line := False
+      searchString:="Status"
+      validationFile:= ".\Validation.txt"
+      line := ReadFileSearchText(validationFile, SearchString)
+      if(line){
+         valid := SearchWordInString(Line, "valid")
+      if(valid){
+         testResult := "Passed"
+         objEnv.Item("testResult") := testResult
+      }else  {
+         addTextFile(console, "Cygnet version is not valid anymore not")
+         testResult := "Failed"
+         return testResult
+      }
+      Sleep(1)
+      command := "Remove-Item -Path .\Validation.txt"
+      RunPowershellCommand(command)
+      }else  {
+         addTextFile(console, "Can not find Cygnet AuthenticodeSignature")
+         testResult :=  "Failed"
+         objEnv.Item("testResult") := testResult
+      }
+   }
+}
+
+getText(element){
+   global cygnetElementsLookupTable
+   global hdWindowName
+   global console
+   global objEnv
+   
+   WinGetTitle, Title, A
+   if(Title = hdWindowName or WinExistActivate(hdWindowName))
+   {
+      Sleep(3)
+      channel := GetElementPosition(cygnetElementsLookupTable, element)
+      here := getTextInImage(channel)
+   } else {
+      addTextFile(console, "Cygnet is not open")
+      testResult :=  "Failed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+OpenCygnet(){
+   global programName
+   global executionFile
+   global programLocation
+   global hdWindowName
+   global feedbackWindow
+   global feedbackWindowName
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      openProgram(programName, executionFile, programLocation)
+      cygnetWindow := WinWait(hdWindowName, 3*60)
+      if (!cygnetWindow)
+      {
+         addTextFile(console, "Select Feedback Window Takes More Than 3 minutes to Lunch!")
+         testResult := "Failed"
+         objEnv.Item("testResult") := testResult
+      } 
+      feedbackWindow := WinWait(feedbackWindowName, 2*60)
+      if (!feedbackWindow)
+      {
+         addTextFile(console, "Select Feedback Window Takes More Than 3 minutes to Lunch!")
+         testResult := "Failed"
+         objEnv.Item("testResult") := testResult
+      } 
+      WinActivate(hdWindowName, windowClass)
+      testResult :=  "Passed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+checkWindowOpened(windowName){
+   global objEnv
+   global console
+
+
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      window := WinWait(windowName, 1*60)
+      if(window)
+      {
+         testResult :=  "Passed"
+         objEnv.Item("testResult") := testResult
+         
+      } else 
+      {
+         errorMess = %windowName% is not open
+         addTextFile(console, errorMess)
+         testResult :=  "Failed"
+         objEnv.Item("testResult") := testResult
+      }
+   }
+}
+
+InstanceClickNoCheck(element){
+   global cygnetElementsLookupTable
+
+   elementCoordinates := GetElementPosition(cygnetElementsLookupTable, element)
+   MoveMouseClickElement(elementCoordinates)
+}
+
+clickElementsRandomly(elements, timeDelayBetweenClicks, noOfCycles){
+   global objEnv
+   global hdWindowName
+   WinGetTitle, Title, A
+   if(Title = hdWindowName or WinExistActivate(hdWindowName))
+   {
+      Loop, %noOfCycles% {
+         if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+         {
+            noOfElements := elements.MaxIndex()
+            Random, elementIndex, 1, noOfElements
+            element := elements[elementIndex]
+            InstanceClickNoCheck(element)
+            Sleep(timeDelayBetweenClicks)
+         } else {
+            return
+         }
+      }
+      testResult :=  "Passed"
+      objEnv.Item("testResult") := testResult
+   }  else {
+      addTextFile(console, "Cygnet is not open")
+      testResult :=  "Failed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+pressMultibleRandomKeys(){
+   global hdWindowName
+   global console
+   global objEnv
+   
+   WinGetTitle, Title, A
+   if(Title = hdWindowName or WinExistActivate(hdWindowName))
+   {
+      Random, keys, 500, 1000
+      Loop, % keys
+      {
+         pressRandomKey()
+      }
+      testResult :=  "Passed"
+      objEnv.Item("testResult") := testResult
+   } else {
+      addTextFile(console, "Cygnet is not open")
+      testResult :=  "Failed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+RandomClickNumber(){
+   Random, clicks, 1, 10
+   return clicks
+}
+
+CloseCygnet()
+{
+   global hdWindowName
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      if(winExistClose(hdWindowName))
+      {
+         testResult :=  "Passed"
+         objEnv.Item("testResult") := testResult
+      }
+      else {
+         addTextFile(console, "Cygnet is not open ")
+         testResult :=  "Failed"
+         objEnv.Item("testResult") := testResult
+      }
+   }
+}
+
+
+checkReportTabIsOPen() {
+   global hdWindowName
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      WinGetTitle, Title, A
+      if(Title = hdWindowName or WinExistActivate(hdWindowName))
+      {
+         reportTab := GetElementPosition(cygnetElementsLookupTable, "Report_Tab")
+         reportTab[2] -= 15
+
+         MoveMouseElement(reportTab)
+         MouseGetPos, x, y
+         PixelGetColor, color, x, y, RGB
+         if(color = "0x268DD3"){
+            testResult :=  "Passed"
+            objEnv.Item("testResult") := testResult
+         } else {
+            addTextFile(console, "Report tab is not open")
+            testResult :=  "Failed"
+            objEnv.Item("testResult") := testResult
+         }
+         return
+      } 
+      addTextFile(console, "Cygnet is not open")
+      testResult :=  "Failed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+feedBackIsOPen()
+{
+   global hdWindowName
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      WinGetTitle, Title, A
+      if(Title = hdWindowName or WinExistActivate(hdWindowName))
+      {
+      feedback := GetElementPosition(cygnetElementsLookupTable, "Feedback_Tab")
+      feedback[2] -= 15
+
+      MoveMouseElement(feedback)
+      
+      MouseGetPos, x, y
+      PixelGetColor, color, x, y, RGB
+      if(color = "0x268DD3"){
+         testResult :=  "Passed"
+         objEnv.Item("testResult") := testResult
+      } else {
+         addTextFile(console, "Feedback tab is not open")
+         testResult :=  "Failed"
+         objEnv.Item("testResult") := testResult
+      }
+      } 
+      addTextFile(console, "Cygnet is not open")
+      testResult :=  "Failed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+graphIsOPen()
+{
+   global hdWindowName
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      WinGetTitle, Title, A
+      if(Title = hdWindowName or WinExistActivate(hdWindowName))
+      {
+         graph := GetElementPosition(cygnetElementsLookupTable, "Graph_Tab")
+         graph[2] -= 15
+
+         MoveMouseElement(graph)
+         
+         MouseGetPos, x, y
+         PixelGetColor, color, x, y, RGB
+         if(color = "0x268DD3"){
+            testResult :=  "Passed"
+            objEnv.Item("testResult") := testResult
+         } else {
+            addTextFile(console, "Graph tab is not open")
+            testResult :=  "Failed"
+            objEnv.Item("testResult") := testResult
+         }
+      } 
+      addTextFile(console, "Cygnet is not open")
+      testResult :=  "Failed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+clickButton(element)
+{
+   global hdWindowName
+   global cygnetElementsLookupTable
+   global console 
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      elements = splitToArray(element, "/")
+      WinGetTitle, Title, A
+      if(Title = hdWindowName or WinExistActivate(hdWindowName))
+      {
+           if(element = "PlayIcon"){
+               clickPlayButton()
+           } else if(element = "StopIcon") {
+               ClickStopButton()
+           }else if(element = "RecordIcon") {
+               ClickRecordButton()
+           }else if(element = "Volume_Slider") {
+               DragVolumeSlider()
+           }else if(element = "EG-Scale") {
+               DragEgScaleSlider()
+           }else if(element = "Start") {
+               StartToolbar()
+           }else if(element = "Stop") {
+               StopToolbar()
+           }else if(element = "Pause") {
+               PauseToolBar()
+           }else if(element = "Record") {
+               RecordToolBar()
+           }else if(element = "GameManuels") {
+               ClickGameManuels()
+           }else if(element = "AddClient") {
+               AddNewClient()
+           }else if(element = "GoBack") {
+               ClickGoBack()
+           }else if(element = "Frequency_SliderValue"){
+               SliderFrequencyValue(element)
+           }else if(element = "Frequency_Slider_Editor"){
+               SliderFrequencyEditor(element)
+           }else if(element = "Clients"){
+               SelectClient()
+           }else if (element = "Exit"){
+               clickExitCygnett()
+           }else {
+               element := GetElementPosition(cygnetElementsLookupTable, element)
+               MoveMouseClickElement(element)
+               Sleep(1)
+               testResult :=  "Passed"
+               objEnv.Item("testResult") := testResult
+           }
+      } else {
+            addTextFile(console, "Cygnet is not open")
+            testResult :=  "Failed"
+            objEnv.Item("testResult") := testResult
+      }
+   }
+}
+
+SelectClient(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      clientsEditSet := GetElementPosition(cygnetElementsLookupTable, "ClientsEditSet")
+      clientsEditSetBefore := takeScreenShot("clientsEditSetBefore", clientsEditSet)
+      Random, dragValue, 1, % minFrequencyBefore[3]
+      clients := GetElementPosition(cygnetElementsLookupTable, "Clients")
+      MoveMouseClickElement(clients)
+      Sleep(1)
+      clientsEditSet := GetElementPosition(cygnetElementsLookupTable, "ClientsEditSet")
+      clientsEditSetAfter := takeScreenShot("clientsEditSetAfter", clientsEditSet)
+      if(!compareImages(clientsEditSetBefore, clientsEditSetAfter)){
+         testResult :=  "Passed"
+         objEnv.Item("testResult") := testResult
+      }else{
+         addTextFile(console, "Edit Set not visible after selecting client")
+         testResult :=  "Failed"
+         objEnv.Item("testResult") := testResult
+      }
+      deleteScreenShot(clientsEditSetBefore)
+      deleteScreenShot(clientsEditSetAfter)
+   }
+}
+
+checkTab(element)
+{
+   global hdWindowName
+   global cygnetElementsLookupTable
+   global console 
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      elements = splitToArray(element, "/")
+      WinGetTitle, Title, A
+      if(Title = hdWindowName or WinExistActivate(hdWindowName))
+      {
+           if(element = "Report"){
+               checkReportTabIsOPen()
+           } else if(element = "Feedback") {
+               feedBackIsOPen()
+           } else if(element = "Graph"){
+               graphIsOPen()
+           }
+      } else {
+            addTextFile(console, "Cygnet is not open")
+            testResult :=  "Failed"
+            objEnv.Item("testResult") := testResult
+      }
+   }
+}
+
+checkTimerUpdate(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   global hdWindowName
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      WinGetTitle, Title, A
+      if(Title = hdWindowName or WinExistActivate(hdWindowName))
+      {
+         playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+         timerBefore := takeScreenShot("timerBefore", playTimer)
+         Sleep(4)
+         playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+         timerafter := takeScreenShot("timerAfter", playTimer)
+         if(!compareImages(timerBefore, timerAfter)){
+            testResult :=  "Passed"
+            objEnv.Item("testResult") := testResult
+         } else{
+            addTextFile(console, "Session stopped as timer is not updating")
+            testResult :=  "Failed"
+            objEnv.Item("testResult") := testResult
+         }
+         deleteScreenShot(timerBefore)
+         deleteScreenShot(timerAfter)
+      }else{
+         addTextFile(console, "Cygnet is not open")
+         testResult :=  "Failed"
+         objEnv.Item("testResult") := testResult
+      }
+   }
+}
+
+checkTimerStopped(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   global hdWindowName
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      WinGetTitle, Title, A
+      if(Title = hdWindowName or WinExistActivate(hdWindowName))
+      {
+         playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+         timerBefore := takeScreenShot("timerBefore", playTimer)
+         Sleep(4)
+         playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+         timerafter := takeScreenShot("timerAfter", playTimer)
+         if(compareImages(timerBefore, timerAfter)){
+            testResult :=  "Passed"
+            objEnv.Item("testResult") := testResult
+         } else{
+            addTextFile(console, "Session is still running as timer still updating") 
+            testResult :=  "Failed"
+            objEnv.Item("testResult") := testResult
+         }
+         deleteScreenShot(timerBefore)
+         deleteScreenShot(timerAfter)
+      }else{
+         addTextFile(console, "Cygnet is not open")
+         testResult :=  "Failed"
+         objEnv.Item("testResult") := testResult
+      }
+   }
+}
+
+closeWindow(windonName){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(WinExistActivateClose(window)){
+      testResult :=  "Passed"
+      objEnv.Item("testResult") := testResult
+   } else{
+      windonName .= " is not Active"
+      addTextFile(console, windonName)
+      testResult :=  "Failed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+clickPlayButton(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+      timerB := takeScreenShot("timerB", playTimer)
+      play := GetElementPosition(cygnetElementsLookupTable, "PlayIcon")
+      img1 := takeScreenShot("img1", play)
+      play := GetElementPosition(cygnetElementsLookupTable, "PlayIcon")
+      MoveMouseClickElement(play)
+      play := GetElementPosition(cygnetElementsLookupTable, "PlayIcon")
+      img2 := takeScreenShot("img2", play)
+      if(!compareImages(img1, img2)){
+           Sleep(2)
+           playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+           timerA := takeScreenShot("timerA", playTimer)
+          if(!compareImages(timerB, timerA)){
+               testResult :=  "Passed"
+            } else{
+              addTextFile(console, "Time is not updated after cicking play button")
+              testResult :=  "Failed"
+            }
+     } else{
+        addTextFile(console, "Play button doesnot work correctly")
+        testResult :=  "Failed"
+
+     }
+      deleteScreenShot(img1)
+      deleteScreenShot(img2)
+      deleteScreenShot(timerB)
+      deleteScreenShot(timerA)
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+ClickStopButton(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+      timerBeforeStop := takeScreenShot("timerBeforeStop", playTimer)
+      Sleep(0.5)
+      stopIcon := GetElementPosition(cygnetElementsLookupTable, "StopIcon")
+      MoveMouseClickElement(stopIcon)
+      Sleep(1)
+      timerAfterStop := takeScreenShot("timerAfterStop", playTimer)
+      if(!compareImages(timerBeforeStop, timerAfterStop)){
+            testResult :=  "Passed"
+      } else {
+         testResult :=  "Failed"
+         addTextFile(console, "On click stop timer doesnot change")
+      }
+      deleteScreenShot(timerBeforeStop)
+      deleteScreenShot(timerAfterStop)
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+ClickRecordButton(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      recordIcon := GetElementPosition(cygnetElementsLookupTable, "RecordIcon")
+      MoveMouseClickElement(recordIcon)
+      Sleep(1)
+      checkTab("Report")
+   }
+}
+
+ClickGoBack(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      goBack := GetElementPosition(cygnetElementsLookupTable, "GoBack")
+      img1 := takeScreenShot("img1", goBack)
+      goBack := GetElementPosition(cygnetElementsLookupTable, "GoBack")
+      MoveMouseClickElement(goBack)
+      Sleep(0.5)
+      img2 := takeScreenShot("img2", goBack)
+      testResult :=  "Passed"
+      if(compareImages(img1, img2)){
+         addTextFile(console, "Back button not working correctly")
+         testResult :=  "Failed"
+      }
+      deleteScreenShot(img1)
+      deleteScreenShot(img2)
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+writeNewUniqueClient(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      addClient := GetElementPosition(cygnetElementsLookupTable, "AddClient")
+      img1 := takeScreenShot("img1", addClient)
+      currentTime := GetCurrentTimeNumbers()
+      uniqueClient = TestClient_%currentTime%
+      writeWord(uniqueClient)
+      objEnv.Item("uniqueClient") := uniqueClient
+      Sleep(0.5)
+      addClient:= GetElementPosition(cygnetElementsLookupTable, "AddClient")
+      img2 := takeScreenShot("img2", addClient)
+      if(!compareImages(img1, img2)){
+         testResult :=  "Passed"
+      }
+      else{
+         addTextFile(console,"Add button not visible")
+         testResult :=  "Failed"
+      }
+      deleteScreenShot(img1)
+      deleteScreenShot(img2)
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+AddNewClient(){
+   global cygnetElementsLookupTable
+   global console
+   global programLocation
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      goBack := GetElementPosition(cygnetElementsLookupTable, "GoBack")
+      img1 := takeScreenShot("img1", goBack)
+      Sleep(0.5)
+      uniqueClient := objEnv.Item("uniqueClient")
+      Sleep(0.5)
+      addClient := GetElementPosition(cygnetElementsLookupTable, "AddClient")
+      MoveMouseClickElement(addClient)
+      goBack := GetElementPosition(cygnetElementsLookupTable, "GoBack")
+      img2 := takeScreenShot("img2", goBack)
+      testResult :=  "Passed"
+      if(!compareImages(img1, img2)){
+         checkSession = \Session\%uniqueClient%
+         newClientFolder = %programLocation%%checkSession%
+         IfNotExist, %newClientFolder%
+         {
+            addTextFile(console, "New folder was not created for the new Client")
+            testResult :=  "Failed"
+         }
+      }else{
+         addTextFile(console, "After adding new Client, the Client was not opened automatically")
+         testResult :=  "Failed"
+      }
+      deleteScreenShot(img1)
+      deleteScreenShot(img2)
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+ClickGameManuels(){
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      clickKeyboardButton(2, "down")
+      clickKeyboardButton(1, "right")
+      testResult :=  "Passed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+clickManuel(manuelName, index){
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      clickKeyboardButton(index, "down")
+      clickKeyboardButton(1, "Enter")
+      Sleep(1)
+      splitManuelName:=StrSplit(manuelName,"/")
+      pdfFile := splitManuelName[splitManuelName.MaxIndex()]
+      WinGetTitle, Title, A
+      Sleep(0.5)
+      if(SearchWordInString(Title, pdfFile)){
+         Send, !d
+         Sleep(2)
+         Send, ^c
+         openedPdf := clipboard
+         if(SearchWordInString(openedPdf, manuelName)){
+            testResult :=  "Passed"
+            objEnv.Item("testResult") := testResult
+         } else {
+           addTextFile(console, "Not the right pdf is opened")
+           testResult :=  "Failed"
+           objEnv.Item("testResult") := testResult
+         }
+      } else {
+        addTextFile(console, "Title of opened pdf manuel not correct")
+        testResult :=  "Failed"
+        objEnv.Item("testResult") := testResult
+      }
+   }
+
+}
+
+clickExitCygnett(){
+   global hdWindowName
+   global cygnetElementsLookupTable
+   global console 
+   global objEnv
+   
+   clickKeyboardButton(4, "down")
+   clickKeyboardButton(1, "Enter")
+   WinGetTitle, Title, A  
+   if(Title = hdWindowName or WinExistActivate(hdWindowName))
+   {
+      addTextFile(console, "Cygnet should be closed but its active!")
+      testResult :=  "Failed"
+      objEnv.Item("testResult") := testResult
+   }else{
+      testResult :=  "Passed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+SliderFrequencyValue(element){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   coordinates := getCoordinatesByWindowControl(CygnetElementsLookUptable.GetCalssNNByNameID(element))
+   x := coordinates[1] + coordinates[3]/2
+   y := coordinates[2] + coordinates[4]/2
+   MoveMouseClick(x,y)
+   testResult :=  "Passed"
+   objEnv.Item("testResult") := testResult
+}
+
+SliderFrequencyEditor(element){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   coordinates := getCoordinatesByWindowControl(CygnetElementsLookUptable.GetCalssNNByNameID(element))
+   x := coordinates[1] + coordinates[3]/2
+   y := coordinates[2] + coordinates[4]/2
+   MoveMouseClick(x,y)
+   clickSelectAll()
+   Send, ^c
+   objEnv.Item("sliderOldValue") := Clipboard
+   sliderOldValue := objEnv.Item("sliderOldValue")
+   testResult :=  "Passed"
+   objEnv.Item("testResult") := testResult
+}
+
+writeRandomFrequency(){
+   global objEnv
+
+   Random, randDes, 0.001, 1
+   Random, randInt, 0, 10
+   rand := randInt + randDes
+   writeWord(rand)
+   objEnv.Item("sliderOldValue") := rand
+}
+
+frequencySliderUpdate(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   Setformat Float, 0.01
+   sliderOldValue := objEnv.Item("sliderOldValue")
+   SliderFrequencyValue("Frequency_SliderValue")
+   coordinates := getCoordinatesByWindowControl(CygnetElementsLookUptable.GetCalssNNByNameID("Frequency_Slider_Editor"))
+   x := coordinates[1] + coordinates[3]/2
+   y := coordinates[2] + coordinates[4]/2
+   MoveMouseClick(x,y)
+   clickSelectAll()
+   Send, ^c
+   sliderNewValue := Clipboard
+   sliderNewValue := Round(sliderNewValue, 3)
+   sliderOldValue := Round(sliderOldValue, 3)
+   if(sliderNewValue = sliderOldValue){
+      testResult :=  "Passed"
+      objEnv.Item("testResult") := testResult
+   } else{
+      addTextFile(console, "Frequency Slider is not Updated after changing the value")
+      testResult :=  "Failed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+DragVolumeSlider(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      Volume_Slider := GetElementPosition(cygnetElementsLookupTable, "Volume_Slider")
+      MoveMouseDragClickElement(Volume_Slider)
+      Sleep(0.5)
+      RefreshDesktop()
+      Sleep(0.5)
+      testResult :=  "Passed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+DragEgScaleSlider(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      minAmplitudeBefore := GetElementPosition(cygnetElementsLookupTable, "EG_MinAmplitude")
+      minAmplitudeValueBefore := takeScreenShot("minAmplitudeValueBefore", minAmplitudeBefore)
+      Random, dragValue, 1, % minAmplitudeBefore[3]
+      eG_Scale := GetElementPosition(cygnetElementsLookupTable, "EG-Scale")
+      MoveMouseDragClickElementRandom(eG_Scale, 0)
+      Sleep(1)
+      eG_Scale := GetElementPosition(cygnetElementsLookupTable, "EG-Scale")
+      MoveMouseDragClickElementRandom(eG_Scale, dragValue)
+      Sleep(1)
+      minAmplitudeAfter := GetElementPosition(cygnetElementsLookupTable, "EG_MinAmplitude")
+      minAmplitudeValueAfter := takeScreenShot("minAmplitudeValueAfter", minAmplitudeAfter)
+      if(!compareImages(minAmplitudeValueBefore, minAmplitudeValueAfter)){
+         testResult :=  "Passed"
+         objEnv.Item("testResult") := testResult
+      }else{
+         addTextFile(console, "After moving frequency slider frequency is not updated")
+         testResult :=  "Failed"
+         objEnv.Item("testResult") := testResult
+      }
+      ;~ deleteScreenShot(minAmplitudeValueBefore)
+      ;~ deleteScreenShot(minAmplitudeValueAfter)
+   }
+}
+
+
+
+StopToolBar(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+      timerBefore := takeScreenShot("timerBefore", playTimer)
+      play := GetElementPosition(cygnetElementsLookupTable, "PlayIcon")
+      img1 := takeScreenShot("img1", play)
+      clickKeyboardButton(5, "down")
+      clickKeyboardButton(1, "Enter")
+      Sleep(3)
+      play := GetElementPosition(cygnetElementsLookupTable, "PlayIcon")
+      img2 := takeScreenShot("img2", play)
+      if(!compareImages(img1, img2)){
+           playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+           timerAfter := takeScreenShot("timerAfter", playTimer)
+       if(!compareImages(timerBefore, timerAfter)){
+            testResult :=  "Passed"
+       } else{
+           addTextFile(console, "Time is not updated after cicking Start in session")
+           testResult :=  "Failed"
+        }
+     } else{
+        addTextFile(console, "Play button doesnot change when click Start in session")
+        testResult :=  "Failed"
+
+     }
+      deleteScreenShot(img1)
+      deleteScreenShot(img2)
+      deleteScreenShot(timerBefore)
+      deleteScreenShot(timerAfter)
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+RecordToolBar(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      clickKeyboardButton(2, "down")
+      clickKeyboardButton(1, "Enter")
+      testResult :=  "Passed"
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+PauseToolBar(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+      timerBefore := takeScreenShot("timerBefore", playTimer)
+      play := GetElementPosition(cygnetElementsLookupTable, "PlayIcon")
+      img1 := takeScreenShot("img1", play)
+      clickKeyboardButton(3, "down")
+      clickKeyboardButton(1, "Enter")
+      Sleep(3)
+      play := GetElementPosition(cygnetElementsLookupTable, "PlayIcon")
+      img2 := takeScreenShot("img2", play)
+      if(!compareImages(img1, img2)){
+           playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+           timerAfter := takeScreenShot("timerAfter", playTimer)
+       if(!compareImages(timerBefore, timerAfter)){
+            testResult :=  "Passed"
+       } else{
+           addTextFile(console, "Time is not updated after cicking Pause in session")
+           testResult :=  "Failed"
+        }
+     } else{
+        addTextFile(console, "Play button doesnot change when click Pause in session")
+        testResult :=  "Failed"
+
+     }
+      deleteScreenShot(img1)
+      deleteScreenShot(img2)
+      deleteScreenShot(timerBefore)
+      deleteScreenShot(timerAfter)
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+StartToolbar(){
+   global cygnetElementsLookupTable
+   global console
+   global objEnv
+
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+      timerBefore := takeScreenShot("timerBefore", playTimer)
+      play := GetElementPosition(cygnetElementsLookupTable, "PlayIcon")
+      img1 := takeScreenShot("img1", play)
+      clickKeyboardButton(1, "down")
+      clickKeyboardButton(1, "Enter")
+      Sleep(3)
+      play := GetElementPosition(cygnetElementsLookupTable, "PlayIcon")
+      img2 := takeScreenShot("img2", play)
+      if(!compareImages(img1, img2)){
+           playTimer := GetElementPosition(cygnetElementsLookupTable, "playTimer")
+           timerAfter := takeScreenShot("timerAfter", playTimer)
+       if(!compareImages(timerBefore, timerAfter)){
+            testResult :=  "Passed"
+       } else{
+           addTextFile(console, "Time is not updated after cicking Start in session")
+           testResult :=  "Failed"
+        }
+     } else{
+        addTextFile(console, "Play button doesnot change when click Start in session")
+        testResult :=  "Failed"
+
+     }
+      deleteScreenShot(img1)
+      deleteScreenShot(img2)
+      deleteScreenShot(timerBefore)
+      deleteScreenShot(timerAfter)
+      objEnv.Item("testResult") := testResult
+   }
+   
+   
+}
+
+CygnetIsMute()
+{
+   global console
+   global objEnv
+   
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+     if (isMute()) {
+         testResult :=  "Passed"
+         objEnv.Item("testResult") := testResult
+      } else {
+         addTextFile(console, "System should be mute but it is not")
+         testResult :=  "Failed"
+         objEnv.Item("testResult") := testResult
+      }
+   }
+}
+
+CygnetIsNotMute()
+{
+  global console
+  global objEnv
+  
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+     if (!isMute()) {
+         testResult :=  "Passed"
+         objEnv.Item("testResult") := testResult
+      } else {
+         addTextFile(console, "System should be not mute but it is")
+         testResult :=  "Failed"
+         objEnv.Item("testResult") := testResult
+      }
+   }
+}
+
+checkNewClientPdf(){
+   global console
+   global programLocation
+   global objEnv
+
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      uniqueClient := objEnv.Item("uniqueClient")
+      checkSession = \Session\%uniqueClient%
+      newClientFolder = %programLocation%%checkSession%
+      pdfNewClient =  %newClientFolder%\*.pdf
+      if FileExist(pdfNewClient){
+         testResult :=  "Passed"
+      } else {
+         addTextFile(console, "PDF file was not created in the new Client folder")
+         testResult :=  "Failed"
+      }
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+checkNewClientXdf(){
+   global console
+   global programLocation
+   global objEnv
+
+   if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      uniqueClient := objEnv.Item("uniqueClient")
+      checkSession = \Session\%uniqueClient%
+      newClientFolder = %programLocation%%checkSession%
+      xdfNewClient =  %newClientFolder%\*.xdf
+      if FileExist(xdfNewClient){
+         testResult :=  "Passed"
+      } else {
+         addTextFile(console, "XDF file was not created in the new Client folder")
+         testResult :=  "Failed"
+      }
+      objEnv.Item("testResult") := testResult
+   }
+}
+
+checkFiles(location, files)
+{
+   global console
+   global objEnv
+
+ if(!SearchWordInString(objEnv.Item("testResult"), "Failed"))
+   {
+      numberOfFiles := files.MaxIndex()
+      Loop, %numberOfFiles%
+      {
+         fileExtention := location
+         fileExtention .= files[A_Index]
+         if (not FileExist(fileExtention))
+         {
+            addTextFile(console, "Files was not created correctly in the new Client folder")
+            ttestResult :=  "Failed"
+            objEnv.Item("testResult") := testResult
+         } 
+      }
+      testResult :=  "Passed"
+      objEnv.Item("testResult") := testResult
+   }
+}

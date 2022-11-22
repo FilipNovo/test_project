@@ -1,0 +1,22 @@
+2022-02-10 14-50-09:  Application started
+2022-02-10 14-50-16:  Test Application started
+2022-02-10 14-50-16:  Test application will start
+2022-02-10 14-50-16:  Closing all opened excel files to prevent excel errors
+2022-02-10 14-50-16:  Done closing all opened excel files
+2022-02-10 14-50-16:  Test application started
+2022-02-10 14-50-23:  Starting to run main application for testing
+2022-02-10 14-50-32:  Main application script started
+2022-02-10 14-50-32:  Creating object from Test cases file to use and copy of it to write the result of running excel file
+2022-02-10 14-50-34:  Done Creating object from Test cases file to use and copy of it to write the result of running excel file
+2022-02-10 14-50-34:  Creating object from elements Lookup excel table
+2022-02-10 14-50-36:  Done Creating object from elements Lookup table
+2022-02-10 14-50-40:  SignatureValidation Started
+2022-02-10 14-50-53:  SignatureValidation Passed
+2022-02-10 14-51-00:  SignatureValidation Ended
+2022-02-10 14-51-50:  SignatureValidation Stopped
+2022-02-10 14-52-02:  OpenCygnet Started
+2022-02-10 14-52-20:  OpenCygnet Passed
+2022-02-10 14-52-28:  OpenCygnet Ended
+2022-02-10 14-52-28:  ExitCygnet Started
+2022-02-10 14-52-45:  Cygnet should be closed but its active!
+2022-02-10 14-52-46:  ExitCygnet Failed

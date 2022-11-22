@@ -1,0 +1,17 @@
+2022-02-10 14-28-40:  Terminal started
+2022-02-10 14-28-40:  Test application will start
+2022-02-10 14-28-40:  Closing all opened excel files to prevent excel errors
+2022-02-10 14-28-40:  Done closing all opened excel files
+2022-02-10 14-28-40:  Test application started
+2022-02-10 14-28-44:  Starting to run main application for testing
+2022-02-10 14-28-52:  Main application script started
+2022-02-10 14-28-52:  Creating object from Test cases file to use and copy of it to write the result of running excel file
+2022-02-10 14-28-56:  Done Creating object from Test cases file to use and copy of it to write the result of running excel file
+2022-02-10 14-28-56:  Creating object from elements Lookup excel table
+2022-02-10 14-28-58:  Done Creating object from elements Lookup table
+2022-02-10 14-29-02:  Elements checking gui is open
+2022-02-10 14-29-14:  Application_Text position is right
+2022-02-10 14-29-23:  AdvMediaPlayer position needs to be re-set
+2022-02-10 14-29-30:  AdvMediaPlayer position is right
+2022-02-10 14-29-30:  Wait saving AdvMediaPlayer  new position
+2022-02-10 14-29-38:  Done saving AdvMediaPlayer  new position
